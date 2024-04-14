@@ -49,17 +49,7 @@
     </author>
     <date year="2024"/>
     <abstract>
-      <t>
-   The Network Configuration Protocol (NETCONF) provides mechanisms to
-   install, manipulate, and delete the configuration of network devices.
-   NETCONF can be carried over various transports such as TCP, SSH or else.
-   QUIC provides useful semantics for Network management and NETCONF in
-   particular a single connection can carry multiple requests over streams,
-   enabling much better efficiency and performance for both peers. QUIC
-   provides shorter handshake and includes TLS. QUIC is also more adaptable
-   to more difficult environments such as those with long delays. This
-   document describes how to use NETCONF over the QUIC transport
-   protocol, named NETCONFoQUIC.</t>
+      <t>The Network Configuration Protocol (NETCONF) provides mechanisms to install, manipulate, and delete the configuration of network devices. NETCONF can be carried over various transports such as TCP, SSH or else.QUIC provides useful semantics for Network management and NETCONF in particular a single connection can carry multiple requests over streams, enabling much better efficiency and performance for both peers. QUIC provides shorter handshake and includes TLS. QUIC is also more adaptable to more difficult environments such as those with long delays. This document describes how to use NETCONF over the QUIC transport protocol, named NETCONFoQUIC.</t>
     </abstract>
   </front>
   <middle>
@@ -69,10 +59,7 @@
       <t>NETCONF can be conceptually partitioned into four layers: Content layer, operation layer, message layer and security transport layer.</t>
       <t>The Secure Transport layer provides a communication path between the client and server.  NETCONF can be layered over any transport protocol that provides a set of basic requirements, the requirements include the following  aspects:</t>
       <ol>
-        <li>NETCONF is connection-oriented, requiring a persistent
-            connection   between peers.  This connection MUST provide reliable,
-            sequenced data   delivery.  NETCONF connections are long-lived,
-            persisting between   protocol operations.</li>
+        <li>NETCONF is connection-oriented, requiring a persistent connection between peers. This connection MUST provide reliable, sequenced data delivery.  NETCONF connections are long-lived, persisting between protocol operations.</li>
         <li>NETCONF connections MUST provide authentication, data integrity, confidentiality, and replay protection.  NETCONF depends on the transport protocol for this capability.</li>
       </ol>
       <t>So, the NETCONF protocol is not bound to any particular transport protocol, but allows a mapping to define how it can be implemented over any specific protocol. At present, some secure transport protocols are defined to carry NETCONF: Secure SHell(SSH)<xref target="RFC6242"/>, Transport Layer Security(TLS)<xref target="RFC7589"/>, Simple Object Access Protocol(SOAP)<xref target="RFC4743"/> and Blocks Extensible Exchange Protocol(BEEP)<xref target="RFC4744"/>.</t>
@@ -88,10 +75,7 @@
     </section>
     <section>
       <name>Terminology and definitions</name>
-      <t>
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-   document are to be interpreted as described in RFC 2119 <xref target="RFC2119"/>.</t>
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 <xref target="RFC2119"/>.</t>
       <t>In this document, the terms "client" and "server" are used to refer to the two ends of the QUIC connection.  The client actively initiates the QUIC connection. The terms "manager" and "agent" are used to refer to the two ends of the NETCONF protocol session. The manager issues NETCONF remote procedure call (RPC) commands, and the agent   replies to those commands. Generally, a "manager" is a "client" meanwhile an "agent" is a "server".</t>
       <ul>
         <li>Client: The endpoint that initiates a QUIC connection.</li>
