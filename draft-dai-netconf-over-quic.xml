@@ -23,11 +23,15 @@
     </author>
     <author initials="S." surname="Yu" fullname="Shaohua Yu">
       <organization abbrev="PCL">China PCL.</organization>
-      <address/>
+      <address>
+          <email>yush@0cae.cn</email>
+      </address>
     </author>
     <author initials="W." surname="Cheng" fullname="Weiqiang Cheng">
       <organization abbrev="China Mobile">China Mobile</organization>
-      <address/>
+      <address>
+          <email>chengweiqiang@chinamobile.com</email>
+      </address>
     </author>
     <author initials="M." surname="Blanchet" fullname="Marc Blanchet">
       <organization abbrev="Viagenie">Viagenie</organization>
@@ -49,73 +53,59 @@
     </author>
     <date year="2024"/>
     <abstract>
-      <t>The Network Configuration Protocol (NETCONF) provides mechanisms to install, manipulate, and delete the configuration of network devices. NETCONF can be carried over various transports such as TCP, SSH or else.QUIC provides useful semantics for Network management and NETCONF in particular a single connection can carry multiple requests over streams, enabling much better efficiency and performance for both peers. QUIC provides shorter handshake and includes TLS. QUIC is also more adaptable to more difficult environments such as those with long delays. This document describes how to use NETCONF over the QUIC transport protocol, named NETCONFoQUIC.</t>
+      <t>The Network Configuration Protocol (NETCONF) provides mechanisms to install, manipulate, and delete the configuration of network devices. NETCONF can be carried over various transports such as TCP, SSH or else. QUIC provides useful semantics for Network management and NETCONF in particular as a single connection can carry multiple requests over streams, enabling much better efficiency and performance for both peers. QUIC provides shorter handshake and includes TLS. QUIC is also more adaptable to more difficult environments such as those with long delays. This document describes how to use NETCONF over the QUIC transport protocol, named NETCONFoQUIC.</t>
     </abstract>
   </front>
   <middle>
     <section>
       <name>Introduction</name>
       <t>The Network Configuration Protocol (NETCONF) <xref target="RFC6241" format="default"/> defines a mechanism through which the configuration of network devices can be installed, manipulated, and deleted.</t>
-      <t>NETCONF can be conceptually partitioned into four layers: Content layer, operation layer, message layer and security transport layer.</t>
-      <t>The Secure Transport layer provides a communication path between the client and server.  NETCONF can be layered over any transport protocol that provides a set of basic requirements, the requirements include the following  aspects:</t>
+      <t>NETCONF can be conceptually partitioned into four layers: content, operation, message and security transport layers.</t>
+      <t>The Secure Transport layer provides a communication path between the client and server.  NETCONF can be layered over any transport protocol that provides a set of basic requirements, such as:</t>
       <ol>
-        <li>NETCONF is connection-oriented, requiring a persistent connection between peers. This connection MUST provide reliable, sequenced data delivery.  NETCONF connections are long-lived, persisting between protocol operations.</li>
+        <li>NETCONF is connection-oriented, requiring a persistent connection between peers. This connection MUST provide reliabl and sequenced data delivery.  NETCONF connections are long-lived, persisting between protocol operations.</li>
         <li>NETCONF connections MUST provide authentication, data integrity, confidentiality, and replay protection.  NETCONF depends on the transport protocol for this capability.</li>
       </ol>
-      <t>So, the NETCONF protocol is not bound to any particular transport protocol, but allows a mapping to define how it can be implemented over any specific protocol. At present, some secure transport protocols are defined to carry NETCONF: Secure SHell(SSH)<xref target="RFC6242"/>, Transport Layer Security(TLS)<xref target="RFC7589"/>, Simple Object Access Protocol(SOAP)<xref target="RFC4743"/> and Blocks Extensible Exchange Protocol(BEEP)<xref target="RFC4744"/>.</t>
+      <t>The NETCONF protocol is not bound to any particular transport protocol, but allows a mapping to define how it can be implemented over any specific protocol. At present, some secure transport protocols are defined to carry NETCONF: Secure SHell(SSH)<xref target="RFC6242"/>, Transport Layer Security(TLS)<xref target="RFC7589"/>, Simple Object Access Protocol(SOAP)<xref target="RFC4743"/> and Blocks Extensible Exchange Protocol(BEEP)<xref target="RFC4744"/>.</t>
       <t>However, because of the connection-oriented feature, almost all of the current secure transport protocols used by NETCONF is TCP based. As is well known, TCP has some shortcomings such as head-of-line blocking.</t>
       <t>QUIC (<xref target="RFC9000"/><xref target="RFC9001"/>) conforms to the above requirements, therefore is also an appropriate transport protocol for NETCONF. Moreover, QUIC provides the following additional benefits not present in the other NETCONF transports:</t>
       <ul>
         <li>Single connection can be long lived and support multiple NETCONF RPC calls and responses within the same connection, using streams. This is very useful for a network management control station who is regularly monitoring devices and therefore having a long lived connection requires way less resources on both peers.</li>
-        <li>1 RTT initial handshake that includes TLS</li>
-        <li>fully encrypted</li>
-        <li>adaptable to more difficult environments such as those with long delays(<xref target="I-D.many-deepspace-ip-assessment"/>, <xref target="I-D.huitema-quic-in-space"/>)</li>
+        <li>1 RTT initial handshake that includes TLS.</li>
+        <li>Fully encrypted</li>
+        <li>Adaptable to more difficult environments such as those with long delays(<xref target="I-D.many-deepspace-ip-assessment"/>, <xref target="I-D.huitema-quic-in-space"/>).</li>
       </ul>
-      <t>It can be learned from the afore-mentioned information that QUIC is also a proper candidate transport protocol for the secure transport layer of NETCONF. In addition, QUIC can perfectly fix the shortcoming such as head of line blocking of TCP. This document specifies how to use QUIC as the secure transport protocol for Netconf.</t>
+      <t>Therefore, QUIC is a proper transport protocol for the secure transport layer of NETCONF. In addition, QUIC does not have the TCP shortcomings such as head of line blocking. This document specifies how to use QUIC as the secure transport protocol for NETCONF.</t>
     </section>
     <section>
-      <name>Terminology and definitions</name>
+      <name>Terminology and Definitions</name>
       <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 <xref target="RFC2119"/>.</t>
       <t>In this document, the terms "client" and "server" are used to refer to the two ends of the QUIC connection.  The client actively initiates the QUIC connection. The terms "manager" and "agent" are used to refer to the two ends of the NETCONF protocol session. The manager issues NETCONF remote procedure call (RPC) commands, and the agent   replies to those commands. Generally, a "manager" is a "client" meanwhile an "agent" is a "server".</t>
       <ul>
-        <li>Client: The endpoint that initiates a QUIC connection.</li>
-        <li>Server: The endpoint that accepts a QUIC connection.</li>
+        <li>Client: The endpoint that initiates a QUIC connection, the NETCONF manager.</li>
+        <li>Server: The endpoint that accepts a QUIC connection, the NETCONF agent.</li>
       </ul>
     </section>
     <section>
-      <name>Connection management</name>
-      <section>
-        <name>Draft Version Identification</name>
-        <t>*RFC Editor's Note:* Please remove this section prior to publication of a final version of this document.</t>
-        <t>NETCONFoQUIC uses the token "NoQ" to identify itself in ALPN and Alt-Svc. Only implementations of the final, published RFC can identify themselves as "NoQ".  Until such an RFC exists, implementations MUSTNOT identify themselves using this string.</t>
-        <t>Implementations of draft versions of the protocol MUST add the string "-" and the corresponding draft number to the identifier.</t>
-      </section>
-      <section>
-        <name>Connection setup</name>
-        <section>
-          <name>Version negotiation</name>
-          <t>QUIC versions are identified using a 32-bit unsigned number, and the version 0x00000000 is reserved to represent version negotiation. Version negotiation ensures that client and server agree to a QUIC version that is mutually supported.</t>
-          <t>The process of version negotiation can be seen in <xref target="RFC9000"/>.</t>
-        </section>
+      <name>Connection Management</name>
         <section>
           <name>Connection establishment</name>
-          <t>QUIC connections are established as described in <xref target="RFC9000"/>. Duringconnection establishment, NETCONFoQUIC support is indicated byselecting the ALPN token "NoQ" in the crypto handshake.</t>
+          <t>QUIC connections are established as described in <xref target="RFC9000"/>. During connection establishment, NETCONFoQUIC support is indicated by selecting the ALPN token as listed in the IANA section<xref target="IANA"/> in the crypto handshake.</t>
           <t>The peer acting as the NETCONF manager MUST also act as the client meanwhile the peer acting as the NETCONF agent must also act as the server.</t>
           <t>The manager should be the initiator of the QUIC connection to the agent meanwhile the agent act as a connection acceptor.</t>
         </section>
-      </section>
       <section>
-        <name>Connection Closure</name>
+        <name>Connection Termination</name>
         <section>
-          <name>QUIC connection termination process</name>
-          <t>The typical QUIC connection termination process can be seen in <xref target="RFC9000"/></t>
+          <name>QUIC Connection Termination Process</name>
+          <t>The typical QUIC connection termination process is described in <xref target="RFC9000"/></t>
         </section>
         <section>
-          <name>NETCONFoQUIC consideration for connection termination</name>
+          <name>NETCONFoQUIC Considerations for Connection Termination</name>
           <t>When a NETCONF session is implemented based on a QUIC connection, the idle timeout should be disabled or the QUIC max_idle_timeout should be set appropriately in order to keep the QUIC connection persistent even if the NETCONF session is idle.</t>
-          <t>When a NETCONF server receives a &lt;close-session&gt; request, it will gracefully close the NETCONF session. The server is recommended to close the associated QUIC connection.</t>
-          <t>When a NETCONF entity receives a &lt;kill-session&gt; request for an open session, it is recommended to close the associated QUIC connection.</t>
-          <t>When a NETCONF entity is going to detect the interuption of QUIC connections, it should send a &lt;close-session&gt; request to the peer NETCONF entity.</t>
+          <t>When a NETCONF server receives a &lt;close-session&gt; request, it will gracefully close the NETCONF session. The server SHOULD close the associated QUIC connection.</t>
+          <t>When a NETCONF entity receives a &lt;kill-session&gt; request for an open session, it SHOULD close the associated QUIC connection.</t>
+          <t>When a NETCONF entity is detecting the interruption of the QUIC connection, it SHOULD send a &lt;close-session&gt; request to the peer NETCONF entity.</t>
           <t>When a stateless reset event occurs, nothing needs to be done by either the manager or the agent.</t>
         </section>
       </section>
@@ -148,7 +138,7 @@ Layer                 Example
        +-------------+      +-----------------------------------------+
 ]]></artwork>
       </figure>
-      <t>It can be learned from <xref target="netconf-protocol-layers-figure"/> that there are two kinds of main data flow exchanged between manager and agent:</t>
+      <t><xref target="netconf-protocol-layers-figure"/> shows that there are two kinds of main data flow exchanged between manager and agent:</t>
       <ul>
         <li>Configuration data from manager to agent.</li>
         <li>Notification data from agent to manager.</li>
@@ -184,23 +174,23 @@ Layer                 Example
         </tbody>
       </table>
       <section>
-        <name>Bidirectional stream between manager and agent</name>
-        <t>NETCONF protocol uses an RPC-based communication model. So, the configuration data from manager to agent is exchanged based on '&lt;RPC&gt;' (the manager initiating) and '&lt;RPC-Reply&gt;' (sent by the agent) and so on. So the messages used to exchange configuration data should be mapped into one or more bidirectional stream whose stream type is 0 according to the above table.</t>
+        <name>Bidirectional Stream Between Manager and Agent</name>
+        <t>NETCONF protocol uses an RPC-based communication model. So, the configuration data from manager to agent is exchanged based on '&lt;RPC&gt;' (the manager initiating) and '&lt;RPC-Reply&gt;' (sent by the agent) and so on. So the messages used to exchange configuration data MUST be mapped into one or more bidirectional stream whose stream type is 0x0 according to the above table.</t>
       </section>
       <section>
-        <name>Unidirectional stream from agent to manager</name>
-        <t>There are some notification data exchanged between the agent and the manager.  Notification is a server-initiated message indicating that a certain event has been recognized by the server.</t>
-        <t>Notification messages are initiated by the agent and no reply is needed from the manager. So the messages used to exchange configuration data should be mapped into one unidirectional stream whose stream type is 3 according to the above table.</t>
+        <name>Unidirectional Stream from Agent to Manager</name>
+        <t>There are some notification data exchanged between the agent and the manager.  Notification is an agent (server)-initiated message indicating that a certain event has been recognized by the agent (server).</t>
+        <t>Notification messages are initiated by the agent and no reply is needed from the manager. So the messages used to exchange configuration data SHOULD be mapped into one unidirectional stream whose stream type is 0x3 according to the above table.</t>
       </section>
     </section>
     <section>
       <name>Endpoint Authentication</name>
       <section>
-        <name>using QUIC handshake authentication</name>
-        <t>NETCONFoQUIC should use the QUIC versions that uses TLS version 1.3 or greater. Then, the TLS handshake process can be used for endpoint authentication.</t>
+        <name>Using QUIC Handshake Authentication</name>
+        <t>NETCONFoQUIC uses QUIC which uses TLS version 1.3 or greater. Therefore, the TLS handshake process can be used for endpoint authentication.</t>
         <section>
-          <name>Using Third-Party authentication</name>
-          <t>A third-party authentication mechanism can also be used for NETCONFoQUIC endpoint authentication. for example, a  TLS client certificates can be used.</t>
+          <name>Using Third-Party Authentication</name>
+          <t>A third-party authentication mechanism can also be used for NETCONFoQUIC endpoint authentication, such as a  TLS client certificate.</t>
         </section>
       </section>
     </section>
@@ -208,10 +198,10 @@ Layer                 Example
       <name>Security Considerations</name>
       <t>The security considerations described throughout <xref target="RFC5246"/> and <xref target="RFC6241"/> apply here as well. This document does not require to support third-party authentication (e.g., backend Authentication, Authorization, and Accounting (AAA) servers) due to the fact that TLS does not specify this way of authentication and that NETCONF depends on the transport protocol for the authentication service. If third-party authentication is needed, TLS client certificates, BEEP or SSH transport can be used. Especially TLS client certificates are recommended to be used here.</t>
       <t>An attacker might be able to inject arbitrary NETCONF messages via some application that does not carefully check exchanged messages deliberately insert the delimiter sequence in a NETCONF message to create a DoS attack.  Hence, applications and NETCONF APIs MUST ensure that the delimiter sequence defined in Section 2.1 never appears in NETCONF messages; otherwise, those messages can be dropped, garbled, or misinterpreted.</t>
-      <t>If invalid data or malformed messages are encountered, a robust implementation of this document must silently discard the message without further processing and then stop the NETCONF session.</t>
+      <t>If invalid data or malformed messages are encountered, a robust implementation of this document MUST silently discard the message without further processing and then stop the NETCONF session.</t>
       <t>Finally, this document does not introduce any new security considerations compared to <xref target="RFC6242"/>.</t>
     </section>
-    <section>
+    <section anchor="IANA">
       <name>IANA Considerations</name>
       <t>This document creates a new registration for the identification of NETCONFoQUIC in the "Application Layer Protocol Negotiation (ALPN) Protocol IDs registry established in <xref target="RFC7301"/>.</t>
       <t>The "noq" string identifies NETCONFoQUIC:</t>
