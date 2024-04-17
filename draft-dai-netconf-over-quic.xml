@@ -24,13 +24,13 @@
     <author initials="S." surname="Yu" fullname="Shaohua Yu">
       <organization abbrev="PCL">China PCL.</organization>
       <address>
-          <email>yush@0cae.cn</email>
+        <email>yush@0cae.cn</email>
       </address>
     </author>
     <author initials="W." surname="Cheng" fullname="Weiqiang Cheng">
       <organization abbrev="China Mobile">China Mobile</organization>
       <address>
-          <email>chengweiqiang@chinamobile.com</email>
+        <email>chengweiqiang@chinamobile.com</email>
       </address>
     </author>
     <author initials="M." surname="Blanchet" fullname="Marc Blanchet">
@@ -88,12 +88,12 @@
     </section>
     <section>
       <name>Connection Management</name>
-        <section>
-          <name>Connection establishment</name>
-          <t>QUIC connections are established as described in <xref target="RFC9000"/>. During connection establishment, NETCONFoQUIC support is indicated by selecting the ALPN token as listed in the IANA section<xref target="IANA"/> in the crypto handshake.</t>
-          <t>The peer acting as the NETCONF manager MUST also act as the client meanwhile the peer acting as the NETCONF agent must also act as the server.</t>
-          <t>The manager should be the initiator of the QUIC connection to the agent meanwhile the agent act as a connection acceptor.</t>
-        </section>
+      <section>
+        <name>Connection establishment</name>
+        <t>QUIC connections are established as described in <xref target="RFC9000"/>. During connection establishment, NETCONFoQUIC support is indicated by selecting the ALPN token as listed in the IANA section<xref target="IANA"/> in the crypto handshake.</t>
+        <t>The peer acting as the NETCONF manager MUST also act as the client meanwhile the peer acting as the NETCONF agent must also act as the server.</t>
+        <t>The manager should be the initiator of the QUIC connection to the agent meanwhile the agent act as a connection acceptor.</t>
+      </section>
       <section>
         <name>Connection Termination</name>
         <section>
